@@ -1,0 +1,2194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>NearHome – Working Prototype</title>
+
+<style>
+:root{
+  --bg:#f3f7f6;
+  --ink:#0f2a33;
+  --mute:#51666d;
+  --card:#fff;
+  --line:#d3e0dd;
+  --deep:#0f3a47;
+  --gold:#f2b134;
+  --gi:#3a2700;
+  --ok:#1d7a5a;
+  --bad:#b3392f;
+  box-sizing:border-box;
+}
+
+*,
+*::before,
+*::after{
+  box-sizing:inherit;
+}
+
+html,
+body{
+  margin:0;
+}
+
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+
+.wrap{
+  max-width:900px;
+  margin:0 auto;
+  padding:0 18px 60px;
+}
+
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  padding:16px 0;
+  flex-wrap:wrap;
+}
+
+.logo{
+  font-weight:800;
+  font-size:22px;
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+.logo i{
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:var(--gold);
+}
+
+.tabs{
+  display:flex;
+  gap:6px;
+  background:var(--card);
+  border:1px solid var(--line);
+  padding:4px;
+  border-radius:99px;
+}
+
+.tabs button{
+  border:0;
+  background:none;
+  color:var(--mute);
+  font:600 14px inherit;
+  font-family:inherit;
+  padding:8px 16px;
+  border-radius:99px;
+  cursor:pointer;
+  min-height:38px;
+}
+
+.tabs button[aria-selected=true]{
+  background:var(--deep);
+  color:#fff;
+}
+
+h1{
+  font-size:26px;
+  margin:8px 0 4px;
+}
+
+h2{
+  font-size:19px;
+  margin:26px 0 10px;
+}
+
+h3{
+  margin:0;
+  font-size:17px;
+}
+
+.sub{
+  color:var(--mute);
+  margin:0 0 16px;
+}
+
+.panel{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:12px;
+}
+
+.row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.row>*{
+  flex:1 1 150px;
+}
+
+label{
+  display:block;
+  font-size:13px;
+  font-weight:600;
+  color:var(--mute);
+  margin-bottom:10px;
+}
+
+input,
+select,
+textarea{
+  display:block;
+  width:100%;
+  margin-top:4px;
+  padding:10px 12px;
+  border:1.5px solid var(--line);
+  border-radius:10px;
+  background:var(--bg);
+  color:var(--ink);
+  font:inherit;
+  min-height:42px;
+}
+
+button.b{
+  border:0;
+  background:var(--gold);
+  color:var(--gi);
+  font:700 15px inherit;
+  font-family:inherit;
+  padding:10px 18px;
+  border-radius:10px;
+  cursor:pointer;
+  min-height:42px;
+}
+
+button.b.s{
+  background:transparent;
+  border:1.5px solid var(--line);
+  color:var(--ink);
+}
+
+button.b.g{
+  background:var(--ok);
+  color:#fff;
+}
+
+button.b.r{
+  background:var(--bad);
+  color:#fff;
+}
+
+.card{
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+}
+
+.av{
+  flex:none;
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  background:var(--gold);
+  color:var(--gi);
+  display:grid;
+  place-items:center;
+  font-weight:800;
+  font-size:20px;
+  object-fit:cover;
+}
+
+.meta{
+  color:var(--mute);
+  font-size:14px;
+}
+
+.grow{
+  flex:1;
+  min-width:0;
+}
+
+.pill{
+  display:inline-block;
+  font-size:12px;
+  font-weight:700;
+  padding:2px 9px;
+  border-radius:99px;
+  background:var(--line);
+  color:var(--ink);
+}
+
+.pill.ok{
+  background:var(--ok);
+  color:#fff;
+}
+
+.pill.bad{
+  background:var(--bad);
+  color:#fff;
+}
+
+.pill.wait{
+  background:var(--gold);
+  color:var(--gi);
+}
+
+.chk{
+  font-size:14px;
+  margin:2px 0;
+}
+
+.y{
+  color:var(--ok);
+}
+
+.n{
+  color:var(--bad);
+}
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:20px;
+  transform:translateX(-50%);
+  background:var(--deep);
+  color:#fff;
+  padding:10px 18px;
+  border-radius:99px;
+  font-size:14px;
+  z-index:9;
+}
+
+.info{
+  font-size:13px;
+  color:var(--mute);
+  margin-top:30px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<header>
+
+<div class="logo">
+<i></i>
+NearHome
+</div>
+
+<div class="tabs" role="tablist" id="tabs"></div>
+
+</header>
+
+<main id="app"></main>
+
+<p class="info">
+Prototype: data is saved in this browser only.
+Admin passcode:
+<b>admin123</b>.
+
+<button
+class="b s"
+style="min-height:32px;padding:4px 10px;font-size:13px"
+data-act="reset">
+Reset demo data
+</button>
+
+</p>
+
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script>
+
+/* =========================
+   NEARHOME JAVASCRIPT
+========================= */
+
+const CATS = [
+  "Home",
+  "Mechanic",
+  "Electrician",
+  "Plumber",
+  "Care Taker"
+];
+
+const KEY = "nearhome_v1";
+
+
+/* Escape HTML */
+const esc = s =>
+  String(s ?? "").replace(
+    /[&<>"']/g,
+    c => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
+    }[c])
+  );
+
+
+/* Generate ID */
+const uid = () =>
+  Math.random().toString(36).slice(2,9);
+
+
+/* =========================
+   SAMPLE PROVIDERS
+========================= */
+
+function seed(){
+
+  const p = (
+    n,c,l,ph,ch,ex,r
+  ) => ({
+    id:uid(),
+    name:n,
+    cat:c,
+    loc:l,
+    phone:ph,
+    charge:ch,
+    exp:ex,
+    age:30,
+    aadhaar:"123456789012",
+    photo:"",
+    status:"approved",
+    ratings:r,
+    sample:1
+  });
+
+  return {
+
+    providers:[
+      p(
+        "Kavitha R.",
+        "Home",
+        "Madagadipet",
+        "9000000001",
+        400,
+        6,
+        [5,4]
+      ),
+
+      p(
+        "Murugan S.",
+        "Electrician",
+        "Madagadipet",
+        "9000000002",
+        350,
+        9,
+        [5]
+      ),
+
+      p(
+        "Raja K.",
+        "Plumber",
+        "Lawspet",
+        "9000000003",
+        300,
+        8,
+        [4,4]
+      ),
+
+      p(
+        "Meena D.",
+        "Care Taker",
+        "Lawspet",
+        "9000000004",
+        600,
+        5,
+        []
+      ),
+
+      p(
+        "Dinesh M.",
+        "Mechanic",
+        "Reddiarpalayam",
+        "9000000005",
+        250,
+        10,
+        [5,5,4]
+      )
+    ],
+
+    bookings:[]
+  };
+}
+
+
+/* =========================
+   DATABASE
+========================= */
+
+let mem = null;
+
+function load(){
+
+  try{
+
+    const r = localStorage.getItem(KEY);
+
+    if(r)
+      return JSON.parse(r);
+
+  }catch(e){}
+
+  return mem || (mem = seed());
+}
+
+function save(){
+
+  mem = db;
+
+  try{
+
+    localStorage.setItem(
+      KEY,
+      JSON.stringify(db)
+    );
+
+  }catch(e){}
+}
+
+let db = load();
+
+
+/* =========================
+   UI STATE
+========================= */
+
+const ui = {
+
+  tab:"customer",
+
+  loc:"",
+
+  cat:"",
+
+  book:null,
+
+  pphone:"",
+
+  admin:false,
+
+  photo:"",
+
+  rate:null
+
+};
+
+
+/* =========================
+   RATING
+========================= */
+
+const avg = r =>
+  r.length
+    ? r.reduce((a,b)=>a+b,0)/r.length
+    : 0;
+
+
+const stars = r =>
+  r.length
+    ? `★ ${avg(r).toFixed(1)} (${r.length})`
+    : "New";
+
+
+/* =========================
+   TOAST MESSAGE
+========================= */
+
+function toast(m){
+
+  const t =
+    document.getElementById("toast");
+
+  t.textContent = m;
+
+  t.hidden = false;
+
+  clearTimeout(toast.h);
+
+  toast.h =
+    setTimeout(
+      ()=>t.hidden=true,
+      2600
+    );
+}
+
+
+/* =========================
+   PROVIDER AVATAR
+========================= */
+
+function avatar(p){
+
+  if(p.photo){
+
+    return `
+      <img
+        class="av"
+        src="${p.photo}"
+        alt="">
+    `;
+
+  }
+
+  return `
+    <div class="av">
+      ${esc(p.name[0])}
+    </div>
+  `;
+}
+
+
+/* =========================
+   CUSTOMER PAGE
+========================= */
+
+function customer(){
+
+  const known = [
+    ...new Set(
+      db.providers
+        .filter(p=>p.status=="approved")
+        .map(p=>p.loc)
+    )
+  ];
+
+  const q =
+    ui.loc.trim().toLowerCase();
+
+  const res =
+    q
+      ? db.providers.filter(
+          p =>
+            p.status=="approved" &&
+            p.loc.toLowerCase()==q &&
+            (!ui.cat || p.cat==ui.cat)
+        )
+      : [];
+
+
+  let h = `
+
+    <h1>
+      Find help in your locality
+    </h1>
+
+    <p class="sub">
+      Only verified providers registered
+      in your exact locality are shown.
+    </p>
+
+    <form class="panel" id="search">
+
+      <div class="row">
+
+        <label>
+          Your locality
+
+          <input
+            name="loc"
+            list="ll"
+            value="${esc(ui.loc)}"
+            placeholder="e.g. Madagadipet"
+            required>
+
+          <datalist id="ll">
+
+            ${known.map(
+              k =>
+              `<option value="${esc(k)}">`
+            ).join("")}
+
+          </datalist>
+
+        </label>
+
+
+        <label>
+          Service
+
+          <select name="cat">
+
+            <option value="">
+              All services
+            </option>
+
+            ${CATS.map(
+              c =>
+              `<option
+                ${ui.cat==c?"selected":""}>
+                ${c}
+              </option>`
+            ).join("")}
+
+          </select>
+
+        </label>
+
+      </div>
+
+      <button class="b">
+        Search
+      </button>
+
+    </form>
+  `;
+
+
+  if(q){
+
+    h += `
+      <h2>
+        ${res.length}
+        verified provider${res.length==1?"":"s"}
+        in ${esc(ui.loc)}
+      </h2>
+    `;
+
+
+    if(!res.length){
+
+      h += `
+        <div class="panel meta">
+          No verified providers match yet.
+          Providers from other localities
+          are never shown.
+        </div>
+      `;
+
+    }
+
+
+    res.forEach(p=>{
+
+      h += `
+
+        <div class="panel">
+
+          <div class="card">
+
+            ${avatar(p)}
+
+            <div class="grow">
+
+              <h3>
+
+                ${esc(p.name)}
+
+                <span class="pill ok">
+                  Verified
+                </span>
+
+              </h3>
+
+              <div class="meta">
+
+                ${p.cat}
+                · ${p.exp} yrs experience
+                · ₹${p.charge} per visit
+                · ${stars(p.ratings)}
+
+              </div>
+
+              <div class="meta">
+
+                Phone:
+                ${esc(p.phone)}
+
+              </div>
+
+            </div>
+
+            <button
+              class="b"
+              data-act="bookopen"
+              data-id="${p.id}">
+
+              Book
+
+            </button>
+
+          </div>
+      `;
+
+
+      if(ui.book==p.id){
+
+        h += `
+
+          <form
+            id="bookform"
+            data-id="${p.id}"
+            style="margin-top:14px">
+
+            <div class="row">
+
+              <label>
+                Your name
+                <input
+                  name="cn"
+                  required>
+              </label>
+
+              <label>
+                Your phone
+                <input
+                  name="cp"
+                  pattern="\\d{10}"
+                  title="10 digit number"
+                  required>
+              </label>
+
+            </div>
+
+
+            <label>
+
+              What do you need?
+
+              <textarea
+                name="note"
+                rows="2"
+                required>
+              </textarea>
+
+            </label>
+
+
+            <button class="b">
+              Send request
+            </button>
+
+            <button
+              type="button"
+              class="b s"
+              data-act="bookclose">
+
+              Cancel
+
+            </button>
+
+          </form>
+
+        `;
+
+      }
+
+      h += `</div>`;
+
+    });
+
+  }
+
+
+  /* BOOKINGS */
+
+  const mine =
+    db.bookings.slice().reverse();
+
+  h += `
+    <h2>Your bookings</h2>
+  `;
+
+
+  if(!mine.length){
+
+    h += `
+      <div class="panel meta">
+        No bookings yet.
+      </div>
+    `;
+
+  }
+
+
+  mine.forEach(b=>{
+
+    const p =
+      db.providers.find(
+        x=>x.id==b.pid
+      ) ||
+      {name:"Removed"};
+
+
+    h += `
+
+      <div class="panel">
+
+        <div class="card">
+
+          <div class="grow">
+
+            <h3>
+
+              ${esc(p.name)}
+
+              <span class="pill ${
+                b.st=="declined"
+                  ?"bad"
+                  :b.st=="requested"
+                  ?"wait"
+                  :"ok"
+              }">
+
+                ${b.st}
+
+              </span>
+
+            </h3>
+
+            <div class="meta">
+
+              ${esc(b.note)}
+              · for
+              ${esc(b.cn)}
+
+            </div>
+
+          </div>
+    `;
+
+
+    if(b.st=="accepted"){
+
+      h += `
+
+        <button
+          class="b g"
+          data-act="done"
+          data-id="${b.id}">
+
+          Work completed
+
+        </button>
+
+      `;
+
+    }
+
+    h += `</div>`;
+
+
+    if(b.st=="accepted"){
+
+      h += `
+
+        <div
+          class="meta"
+          style="margin-top:8px">
+
+          Pay ${esc(p.name)}
+          in person
+          (₹${p.charge})
+          once the work is done.
+
+        </div>
+
+      `;
+
+    }
+
+
+    if(b.st=="completed"){
+
+      h +=
+
+        ui.rate==b.id
+
+        ? `
+
+          <form
+            id="rateform"
+            data-id="${b.id}"
+            style="margin-top:12px">
+
+            <div class="row">
+
+              <label>
+
+                Rating
+
+                <select name="r">
+
+                  <option>5</option>
+                  <option>4</option>
+                  <option>3</option>
+                  <option>2</option>
+                  <option>1</option>
+
+                </select>
+
+              </label>
+
+            </div>
+
+            <button class="b">
+              Submit rating
+            </button>
+
+          </form>
+
+        `
+
+        :
+
+        `
+
+          <button
+            class="b s"
+            style="margin-top:10px"
+            data-act="rateopen"
+            data-id="${b.id}">
+
+            Rate this work
+
+          </button>
+
+        `;
+
+    }
+
+
+    h += `</div>`;
+
+  });
+
+
+  return h;
+}
+
+
+/* =========================
+   PROVIDER PAGE
+========================= */
+
+function provider(){
+
+  let h = `
+
+    <h1>
+      Provider area
+    </h1>
+
+    <p class="sub">
+
+      Register once.
+      You appear in search only after
+      the admin verifies you.
+
+    </p>
+
+
+    <form
+      class="panel"
+      id="reg">
+
+      <h3>
+        Register as provider
+      </h3>
+
+      <br>
+
+
+      <div class="row">
+
+        <label>
+
+          Full name
+
+          <input
+            name="name"
+            required>
+
+        </label>
+
+
+        <label>
+
+          Service
+
+          <select name="cat">
+
+            ${CATS.map(
+              c =>
+              `<option>${c}</option>`
+            ).join("")}
+
+          </select>
+
+        </label>
+
+      </div>
+
+
+      <div class="row">
+
+        <label>
+
+          Locality
+
+          <input
+            name="loc"
+            required
+            placeholder="e.g. Lawspet">
+
+        </label>
+
+
+        <label>
+
+          Phone (10 digits)
+
+          <input
+            name="phone"
+            pattern="\\d{10}"
+            required>
+
+        </label>
+
+      </div>
+
+
+      <div class="row">
+
+        <label>
+
+          Charge per visit (₹)
+
+          <input
+            name="charge"
+            type="number"
+            min="1"
+            required>
+
+        </label>
+
+
+        <label>
+
+          Experience (years)
+
+          <input
+            name="exp"
+            type="number"
+            min="0"
+            required>
+
+        </label>
+
+
+        <label>
+
+          Age
+
+          <input
+            name="age"
+            type="number"
+            required>
+
+        </label>
+
+      </div>
+
+
+      <div class="row">
+
+        <label>
+
+          Aadhaar number
+          (12 digits)
+
+          <input
+            name="aadhaar"
+            pattern="\\d{12}"
+            title="12 digits"
+            required>
+
+        </label>
+
+
+        <label>
+
+          Photo
+
+          <input
+            type="file"
+            id="photo"
+            accept="image/*">
+
+        </label>
+
+      </div>
+
+
+      ${
+        ui.photo
+        ?
+        `
+          <img
+            class="av"
+            src="${ui.photo}"
+            alt="Photo preview">
+
+          <br><br>
+        `
+        :
+        ""
+      }
+
+
+      <button class="b">
+
+        Submit for verification
+
+      </button>
+
+    </form>
+
+
+    <form
+      class="panel"
+      id="plogin">
+
+      <h3>
+        Check my profile and requests
+      </h3>
+
+      <br>
+
+      <div class="row">
+
+        <label>
+
+          Phone number
+
+          <input
+            name="phone"
+            pattern="\\d{10}"
+            value="${esc(ui.pphone)}"
+            required>
+
+        </label>
+
+      </div>
+
+      <button class="b s">
+
+        Open dashboard
+
+      </button>
+
+    </form>
+
+  `;
+
+
+  if(ui.pphone){
+
+    const mine =
+      db.providers.filter(
+        p=>p.phone==ui.pphone
+      );
+
+
+    if(!mine.length){
+
+      h += `
+
+        <div class="panel meta">
+
+          No profile found for
+          ${esc(ui.pphone)}.
+
+        </div>
+
+      `;
+
+    }
+
+
+    mine.forEach(p=>{
+
+      h += `
+
+        <div class="panel">
+
+          <div class="card">
+
+            ${avatar(p)}
+
+            <div class="grow">
+
+              <h3>
+
+                ${esc(p.name)}
+
+                <span class="pill ${
+                  p.status=="approved"
+                    ?"ok"
+                    :p.status=="rejected"
+                    ?"bad"
+                    :"wait"
+                }">
+
+                  ${
+                    p.status=="pending"
+                      ?"Awaiting verification"
+                      :p.status
+                  }
+
+                </span>
+
+              </h3>
+
+
+              <div class="meta">
+
+                ${p.cat}
+                · ${esc(p.loc)}
+                · ${stars(p.ratings)}
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <h2>
+          Requests for ${esc(p.name)}
+        </h2>
+
+      `;
+
+
+      const bs =
+        db.bookings
+          .filter(b=>b.pid==p.id)
+          .reverse();
+
+
+      if(!bs.length){
+
+        h += `
+
+          <div class="panel meta">
+
+            No requests yet.
+
+          </div>
+
+        `;
+
+      }
+
+
+      bs.forEach(b=>{
+
+        h += `
+
+          <div class="panel">
+
+            <div class="card">
+
+              <div class="grow">
+
+                <h3>
+
+                  ${esc(b.cn)}
+                  ·
+                  ${esc(b.cp)}
+
+                  <span class="pill ${
+                    b.st=="declined"
+                      ?"bad"
+                      :b.st=="requested"
+                      ?"wait"
+                      :"ok"
+                  }">
+
+                    ${b.st}
+
+                  </span>
+
+                </h3>
+
+
+                <div class="meta">
+
+                  ${esc(b.note)}
+
+                </div>
+
+              </div>
+
+        `;
+
+
+        if(b.st=="requested"){
+
+          h += `
+
+            <button
+              class="b g"
+              data-act="acc"
+              data-id="${b.id}">
+
+              Accept
+
+            </button>
+
+            <button
+              class="b r"
+              data-act="dec"
+              data-id="${b.id}">
+
+              Decline
+
+            </button>
+
+          `;
+
+        }
+
+
+        h += `
+
+            </div>
+
+          </div>
+
+        `;
+
+      });
+
+    });
+
+  }
+
+
+  return h;
+}
+
+
+/* =========================
+   ADMIN PAGE
+========================= */
+
+function admin(){
+
+  if(!ui.admin){
+
+    return `
+
+      <h1>
+        Admin
+      </h1>
+
+      <p class="sub">
+        Enter the passcode to verify providers.
+      </p>
+
+
+      <form
+        class="panel"
+        id="alogin">
+
+        <label>
+
+          Passcode
+
+          <input
+            type="password"
+            name="pw"
+            required>
+
+        </label>
+
+
+        <button class="b">
+
+          Sign in
+
+        </button>
+
+      </form>
+
+    `;
+
+  }
+
+
+  const pend =
+    db.providers.filter(
+      p=>p.status=="pending"
+    );
+
+
+  let h = `
+
+    <h1>
+      Verification queue
+    </h1>
+
+    <p class="sub">
+      Approve only when all checks pass.
+    </p>
+
+  `;
+
+
+  if(!pend.length){
+
+    h += `
+
+      <div class="panel meta">
+
+        No providers waiting.
+
+      </div>
+
+    `;
+
+  }
+
+
+  pend.forEach(p=>{
+
+    const a =
+      /^\d{12}$/.test(p.aadhaar);
+
+    const g =
+      p.age>=18 &&
+      p.age<=65;
+
+    const ph =
+      !!p.photo;
+
+    const ex =
+      p.exp>=0;
+
+    const all =
+      a && g && ph;
+
+
+    const c =
+      (ok,t) =>
+      `<div class="chk ${
+        ok?"y":"n"
+      }">
+        ${ok?"✓":"✗"} ${t}
+      </div>`;
+
+
+    h += `
+
+      <div class="panel">
+
+        <div class="card">
+
+          ${avatar(p)}
+
+          <div class="grow">
+
+            <h3>
+              ${esc(p.name)}
+            </h3>
+
+
+            <div class="meta">
+
+              ${p.cat}
+              · ${esc(p.loc)}
+              · ${esc(p.phone)}
+              · ₹${p.charge}
+
+            </div>
+
+            <br>
+
+
+            ${c(
+              a,
+              "Aadhaar: 12-digit number ending "
+              + esc(p.aadhaar.slice(-4))
+            )}
+
+            ${c(
+              g,
+              "Age: "
+              + p.age
+              + " (must be 18–65)"
+            )}
+
+            ${c(
+              ph,
+              "Photo uploaded"
+            )}
+
+            ${c(
+              ex,
+              "Experience: "
+              + p.exp
+              + " years"
+            )}
+
+          </div>
+
+        </div>
+
+
+        <br>
+
+
+        <button
+          class="b g"
+          data-act="appr"
+          data-id="${p.id}"
+          ${all
+            ?""
+            :"disabled style='opacity:.5'"
+          }>
+
+          Approve
+
+        </button>
+
+
+        <button
+          class="b r"
+          data-act="rej"
+          data-id="${p.id}">
+
+          Reject
+
+        </button>
+
+      </div>
+
+    `;
+
+  });
+
+
+  h += `
+
+    <h2>
+      Approved providers
+    </h2>
+
+  `;
+
+
+  db.providers
+    .filter(
+      p=>p.status=="approved"
+    )
+    .forEach(p=>{
+
+      h += `
+
+        <div class="panel">
+
+          <div class="card">
+
+            <div class="grow">
+
+              <h3>
+
+                ${esc(p.name)}
+
+                ${
+                  p.sample
+                  ?
+                  `<span class="pill">
+                    sample
+                  </span>`
+                  :
+                  ""
+                }
+
+              </h3>
+
+
+              <div class="meta">
+
+                ${p.cat}
+                · ${esc(p.loc)}
+                · ${stars(p.ratings)}
+
+              </div>
+
+            </div>
+
+
+            <button
+              class="b s"
+              data-act="rm"
+              data-id="${p.id}">
+
+              Remove
+
+            </button>
+
+          </div>
+
+        </div>
+
+      `;
+
+    });
+
+
+  return h + `
+
+    <button
+      class="b s"
+      data-act="logout">
+
+      Sign out
+
+    </button>
+
+  `;
+
+}
+
+
+/* =========================
+   RENDER
+========================= */
+
+function render(){
+
+  document.getElementById("tabs").innerHTML =
+
+    ["customer","provider","admin"]
+
+      .map(
+        t => `
+
+          <button
+            role="tab"
+            aria-selected="${ui.tab==t}"
+            data-tab="${t}">
+
+            ${
+              t[0].toUpperCase()
+              + t.slice(1)
+            }
+
+          </button>
+
+        `
+      )
+      .join("");
+
+
+  document.getElementById("app").innerHTML =
+
+    ({
+      customer,
+      provider,
+      admin
+    })[ui.tab]();
+
+}
+
+
+/* =========================
+   BUTTON EVENTS
+========================= */
+
+document.addEventListener(
+  "click",
+  e => {
+
+    const t =
+      e.target.closest("[data-tab]");
+
+    if(t){
+
+      ui.tab =
+        t.dataset.tab;
+
+      return render();
+
+    }
+
+
+    const b =
+      e.target.closest("[data-act]");
+
+    if(!b)
+      return;
+
+
+    const a =
+      b.dataset.act;
+
+    const id =
+      b.dataset.id;
+
+
+    const P =
+      db.providers.find(
+        x=>x.id==id
+      );
+
+    const B =
+      db.bookings.find(
+        x=>x.id==id
+      );
+
+
+    if(a=="reset"){
+
+      db = seed();
+
+      save();
+
+      ui.book=null;
+      ui.pphone="";
+      ui.photo="";
+
+      toast(
+        "Demo data reset"
+      );
+
+    }
+
+
+    else if(a=="bookopen"){
+
+      ui.book=id;
+
+    }
+
+
+    else if(a=="bookclose"){
+
+      ui.book=null;
+
+    }
+
+
+    else if(a=="acc"){
+
+      B.st="accepted";
+
+      toast(
+        "Request accepted"
+      );
+
+    }
+
+
+    else if(a=="dec"){
+
+      B.st="declined";
+
+      toast(
+        "Request declined"
+      );
+
+    }
+
+
+    else if(a=="done"){
+
+      B.st="completed";
+
+      toast(
+        "Marked complete. Pay the provider in person."
+      );
+
+    }
+
+
+    else if(a=="rateopen"){
+
+      ui.rate=id;
+
+    }
+
+
+    else if(a=="appr"){
+
+      P.status="approved";
+
+      toast(
+        P.name
+        + " is now live in "
+        + P.loc
+      );
+
+    }
+
+
+    else if(a=="rej"){
+
+      P.status="rejected";
+
+      toast(
+        P.name
+        + " rejected"
+      );
+
+    }
+
+
+    else if(a=="rm"){
+
+      db.providers =
+        db.providers.filter(
+          x=>x.id!=id
+        );
+
+    }
+
+
+    else if(a=="logout"){
+
+      ui.admin=false;
+
+    }
+
+
+    save();
+
+    render();
+
+  }
+);
+
+
+/* =========================
+   FORM EVENTS
+========================= */
+
+document.addEventListener(
+  "submit",
+  e => {
+
+    e.preventDefault();
+
+    const f =
+      e.target;
+
+    const d =
+      Object.fromEntries(
+        new FormData(f)
+      );
+
+
+    /* SEARCH */
+
+    if(f.id=="search"){
+
+      ui.loc=d.loc;
+      ui.cat=d.cat;
+      ui.book=null;
+
+    }
+
+
+    /* BOOKING */
+
+    else if(f.id=="bookform"){
+
+      db.bookings.push({
+
+        id:uid(),
+
+        pid:f.dataset.id,
+
+        cn:d.cn,
+
+        cp:d.cp,
+
+        note:d.note,
+
+        st:"requested"
+
+      });
+
+
+      ui.book=null;
+
+      save();
+
+      toast(
+        "Request sent to provider"
+      );
+
+    }
+
+
+    /* RATING */
+
+    else if(f.id=="rateform"){
+
+      const B =
+        db.bookings.find(
+          x=>x.id==f.dataset.id
+        );
+
+
+      B.st="reviewed";
+
+
+      const p =
+        db.providers.find(
+          x=>x.id==B.pid
+        );
+
+
+      if(p)
+        p.ratings.push(+d.r);
+
+
+      ui.rate=null;
+
+      save();
+
+      toast(
+        "Thanks for rating"
+      );
+
+    }
+
+
+    /* PROVIDER REGISTRATION */
+
+    else if(f.id=="reg"){
+
+      if(!ui.photo){
+
+        return toast(
+          "Please add a photo"
+        );
+
+      }
+
+
+      db.providers.push({
+
+        id:uid(),
+
+        name:d.name,
+
+        cat:d.cat,
+
+        loc:d.loc.trim(),
+
+        phone:d.phone,
+
+        charge:+d.charge,
+
+        exp:+d.exp,
+
+        age:+d.age,
+
+        aadhaar:d.aadhaar,
+
+        photo:ui.photo,
+
+        status:"pending",
+
+        ratings:[]
+
+      });
+
+
+      ui.pphone=d.phone;
+
+      ui.photo="";
+
+      save();
+
+      toast(
+        "Submitted. Waiting for admin verification"
+      );
+
+    }
+
+
+    /* PROVIDER LOGIN */
+
+    else if(f.id=="plogin"){
+
+      ui.pphone=d.phone;
+
+    }
+
+
+    /* ADMIN LOGIN */
+
+    else if(f.id=="alogin"){
+
+      if(d.pw=="admin123"){
+
+        ui.admin=true;
+
+        toast(
+          "Admin login successful"
+        );
+
+      }
+
+      else{
+
+        return toast(
+          "Wrong passcode"
+        );
+
+      }
+
+    }
+
+
+    render();
+
+  }
+);
+
+
+/* =========================
+   PHOTO UPLOAD
+========================= */
+
+document.addEventListener(
+  "change",
+  e => {
+
+    if(
+      e.target.id!="photo" ||
+      !e.target.files[0]
+    )
+      return;
+
+
+    const r =
+      new FileReader();
+
+
+    r.onload = () => {
+
+      const im =
+        new Image();
+
+
+      im.onload = () => {
+
+        const c =
+          document.createElement(
+            "canvas"
+          );
+
+
+        c.width =
+          c.height =
+          120;
+
+
+        const s =
+          Math.min(
+            im.width,
+            im.height
+          );
+
+
+        c.getContext("2d")
+          .drawImage(
+            im,
+            (im.width-s)/2,
+            (im.height-s)/2,
+            s,
+            s,
+            0,
+            0,
+            120,
+            120
+          );
+
+
+        ui.photo =
+          c.toDataURL(
+            "image/jpeg",
+            .7
+          );
+
+
+        const keep =
+          document.getElementById(
+            "reg"
+          );
+
+
+        const vals =
+          Object.fromEntries(
+            new FormData(keep)
+          );
+
+
+        render();
+
+
+        const nf =
+          document.getElementById(
+            "reg"
+          );
+
+
+        for(
+          const k in vals
+        ){
+
+          if(nf.elements[k])
+            nf.elements[k].value =
+              vals[k];
+
+        }
+
+      };
+
+
+      im.src=r.result;
+
+    };
+
+
+    r.readAsDataURL(
+      e.target.files[0]
+    );
+
+  }
+);
+
+
+/* =========================
+   START APPLICATION
+========================= */
+
+render();
+
+</script>
+
+</body>
+</html>
